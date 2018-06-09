@@ -1,4 +1,4 @@
-# php-error-handler 2.0.0
+# php-error-handler 2.0.2
 
 PHP Error Handler can send you comprehensive error reports via email as well as output to the screen if you so choose.
 
