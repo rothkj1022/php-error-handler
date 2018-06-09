@@ -29,14 +29,14 @@ Released under the MIT license - http://opensource.org/licenses/MIT
 Run the following command in your command line shell in your php project
 
 ```sh
-$ composer require rothkj1022/php-error-handler:^2.0.0
+$ composer require rothkj1022/php-error-handler
 ```
 
 Done.
 
 You may also edit composer.json manually then perform ```composer update```:
 
-```json
+```
 "require": {
     "rothkj1022/php-error-handler": "^2.0.0"
 }
@@ -47,16 +47,17 @@ You may also edit composer.json manually then perform ```composer update```:
 ### Example usage with composer
 ```php
 require('vendor/autoload.php');
-use rothkj1022\errorHandler;
+use rothkj1022\PHPErrorHandler;
 
-$errorHandler = new errorHandler();
+$errorHandler = new PHPErrorHandler\PHPErrorHandler();
 ```
 
 ### Example usage without composer
 ```php
 require('src/class.errorhandler.php');
+use rothkj1022\PHPErrorHandler;
 
-$errorHandler = new errorHandler();
+$errorHandler = new PHPErrorHandler\PHPErrorHandler();
 ```
 
 ### Example with email and database configuration
@@ -64,7 +65,7 @@ $errorHandler = new errorHandler();
 After including the class file via autoload.php or directly, instantiate the object with a json array like this:
 
 ```php
-$errorHandler = new errorHandler([
+$errorHandler = new PHPErrorHandler\PHPErrorHandler([
 	'displayErrors' => false,
 	'emailErrors' => true,
 	'logErrors' => true, //requires database
@@ -164,7 +165,7 @@ options: array
 
 ##### MySQL Example:
 
-```json
+```
 [
 	'driver' => 'mysql',
 	'hostname' => 'localhost',
@@ -179,7 +180,7 @@ options: array
 
 ##### PDO (with mysql) Example:
 
-```json
+```
 [
 	'driver' => 'pdo',
 	'dsn' => 'mysql:host=localhost;dbname= mydatabase;port=3306;charset=UTF8',
@@ -417,7 +418,7 @@ options: array
 
 ###### Example
 
-```json
+```
 // Disable verification for self-signed ssl certificates
 [
 	'ssl' => [
