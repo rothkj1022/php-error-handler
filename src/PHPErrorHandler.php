@@ -56,7 +56,10 @@ class PHPErrorHandler {
 			],
 			'errorTypes' => [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR],
 			'warningTypes' => [E_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_USER_WARNING, E_RECOVERABLE_ERROR],
-			'noticeTypes' => [E_NOTICE, E_USER_NOTICE, E_DEPRECATED, E_USER_DEPRECATED]
+			'noticeTypes' => [E_NOTICE, E_USER_NOTICE, E_DEPRECATED, E_USER_DEPRECATED],
+			'handleErrors' => true,
+			'handleWarnings' => true,
+			'handleNotices' => false
 		];
 
 		// Merge settings
@@ -89,19 +92,17 @@ class PHPErrorHandler {
 	}
 
 	private function errorString($errno, $errstr, $errfile, $errline) {
-		$output = '';
-		if (in_array($errno, $this->config['errorTypes'])) {
+		$output = false;
+		if (in_array($errno, $this->config['errorTypes']) && $this->config['handleErrors']) {
 			$output = "<b>Fatal Error:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
-		} else if (in_array($errno, $this->config['warningTypes'])) {
+		} else if (in_array($errno, $this->config['warningTypes']) && $this->config['handleWarnings']) {
 			$output = "<b>Warning:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
-		} else if (in_array($errno, $this->config['noticeTypes'])) {
+		} else if (in_array($errno, $this->config['noticeTypes']) && $this->config['handleNotices']) {
 			$output = "<b>Notice:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
 		} else if (in_array($errno, array(E_STRICT))) {
-			$output = "<b>Strict Standards:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
-		} else if (in_array($errno, array(E_DEPRECATED, E_USER_DEPRECATED))) {
-			$output = "<b>Deprecated:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
+			//$output = "<b>Strict Standards:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
 		} else {
-			$output = "<b>Unknown error type [$errno]:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
+			//$output = "<b>Unknown error type [$errno]:</b> $errstr in <b>$errfile</b> on line <b>$errline</b>";
 		}
 		return $output;
 	}
@@ -115,13 +116,13 @@ class PHPErrorHandler {
 		}
 
 		$arrayVars = [
-			'$_GET' => $_GET,
-			'$_POST' => $_POST,
-			//'$_REQUEST' => $_REQUEST,
-			'$_FILES' => $_FILES,
-			'$_COOKIE' => $_COOKIE,
-			'$_SESSION' => $_SESSION,
-			'$_SERVER' => $_SERVER
+			'$_GET' => (isset($_GET) ? $_GET : array()),
+			'$_POST' => (isset($_POST) ? $_POST : array()),
+			//'$_REQUEST' => (isset($_SESSION) ? $_SESSION : array())$_REQUEST,
+			'$_FILES' => (isset($_FILES) ? $_FILES : array()),
+			'$_COOKIE' => (isset($_COOKIE) ? $_COOKIE : array()),
+			'$_SESSION' => (isset($_SESSION) ? $_SESSION : array()),
+			'$_SERVER' => (isset($_SERVER) ? $_SERVER : array())
 		];
 		//for ($i = 0; $i < sizeof($arrayVars); $i++) {
 		foreach ($arrayVars as $aryKey => $aryTmp) {

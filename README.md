@@ -1,4 +1,4 @@
-# php-error-handler 2.0.2
+# php-error-handler 2.0.3
 
 PHP Error Handler can send you comprehensive error reports via email as well as output to the screen if you so choose.
 
@@ -456,6 +456,32 @@ default: [E_NOTICE, E_USER_NOTICE, E_DEPRECATED, E_USER_DEPRECATED]
 options: array
 ```
 
+#### handleErrors
+
+Whether or not to process errors
+
+```
+default: true
+options: boolean (true, false)
+```
+
+#### handleWarnings
+
+Whether or not to process warnings
+
+```
+default: true
+options: boolean (true, false)
+```
+
+#### handleNotices
+
+Whether or not to process notices
+
+```
+default: false
+options: boolean (true, false)
+```
 
 ### Public methods
 
@@ -495,6 +521,14 @@ $errorHandler->sendError('$myVar is not defined.', 'You should really define tha
 ```
 
 ## Changelog
+
+### Version 2.0.3
+
+* Added config vars to disable processing errors, warnings, and notices
+
+### Version 2.0.1 & 2.0.2
+
+* Fixes for composer integration
 
 ### Version 2.0.0
 
