@@ -40,6 +40,10 @@ class PHPErrorHandler {
 					'address' => '',
 					'name' => ''
 				],
+				'replyTo' => [
+					'address' => '',
+					'name' => ''
+				],
 				'subject' => 'PHP Error Report from ' . $_SERVER['SERVER_NAME'],
 				'PHPMailer' => [
 					'CharSet' => 'utf-8',
@@ -307,7 +311,11 @@ class PHPErrorHandler {
 		$mail->FromName = ((!empty($emailConfig['from']['name'])) ? $emailConfig['from']['name'] : $emailConfig['from']['address']);
 
 		// When user hits reply in their mail client, the email will go to this address.
-		$mail->addReplyTo($mail->From, $mail->FromName);
+		if (!empty($emailConfig['replyTo']['address'])) {
+			$mail->addReplyTo($emailConfig['replyTo']['address'], ((!empty($emailConfig['replyTo']['name'])) ? $emailConfig['replyTo']['name'] : ''));
+		} else {
+			$mail->addReplyTo($mail->From, $mail->FromName);
+		}
 
 		// Set recipient(s)
 		foreach ($emailConfig['recipients']['to'] as $recipient) {

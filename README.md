@@ -1,4 +1,4 @@
-# php-error-handler 2.0.3
+# php-error-handler 2.0.4
 
 PHP Error Handler can send you comprehensive error reports via email as well as output to the screen if you so choose.
 
@@ -301,6 +301,26 @@ options: string
 ```
 
 #### from
+
+##### address
+
+Email address of the contact
+
+```
+default: null
+options: string (valid email address)
+```
+
+##### name
+
+Name of the contact
+
+```
+default: null
+options: string
+```
+
+#### replyTo
 
 ##### address
 

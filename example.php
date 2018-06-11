@@ -2,8 +2,6 @@
 require('vendor/autoload.php');
 require('src/PHPErrorHandler.php');
 
-use rothkj1022\PHPErrorHandler;
-
 // contants for testing
 define('ENVIRONMENT', 'development'); // development, testing or production
 define('DB_HOSTNAME', 'localhost');
@@ -17,70 +15,9 @@ define('DB_CHARSET', 'utf8');
 date_default_timezone_set("America/Chicago");
 
 //INSTANTIATE ERROR HANDLER
-if (ENVIRONMENT == 'production') {
-	$displayErrors = false;
-	$emailErrors = true;
-} else {
-	$displayErrors = true;
-	$emailErrors = false;
-}
-
-$errorHandler = new PHPErrorHandler\PHPErrorHandler([
-	'displayErrors' => $displayErrors,
-	'emailErrors' => $emailErrors,
-	'logErrors' => true, //requires database
-	'purgeLogTimeout' => '1 DAY', //use mysql date_add interval syntax or set to false
-	'floodControl' => '15 MINUTE', //use mysql date_add interval syntax or set to false
-	'database' => [
-		/*'driver' => 'mysql', //pdo or mysql
-		'hostname' => DB_HOSTNAME,
-		'username' => DB_USERNAME,
-		'password' => DB_PASSWORD,
-		'database' => DB_DATABASE,
-		'port' => DB_PORT,
-		'charset' => DB_CHARSET,*/
-		'driver' => 'pdo', //pdo or mysql
-		'dsn' => 'mysql:host='.DB_HOSTNAME.';dbname='.DB_DATABASE.';port='.DB_PORT.';charset=UTF8',
-		'username' => DB_USERNAME,
-		'password' => DB_PASSWORD
-	],
-	'email' => [
-		'recipients' => [
-			'to' => [
-				[
-					'address' => 'testguy@domain.com',
-					'name' => 'Test Guy'
-				],
-				[
-					'address' => 'testgal@domain.com',
-					'name' => 'Test Gal'
-				]
-			],
-			'cc' => [
-				[
-					'address' => 'cc@domain.com',
-					'name' => 'Test CC'
-				]
-			],
-			'bcc' => [
-				[
-					'address' => 'bcc@domain.com',
-					'name' => 'Test BCC'
-				]
-			]
-		],
-		'from' => [
-			'address' => 'noreply@domain.com',
-			'name' => 'No Reply'
-		],
-		'PHPMailer' => [
-			'isSMTP' => true,
-			//'SMTPDebug' => ((ENVIRONMENT == 'production') ? 0 : 2), // More info: https://github.com/PHPMailer/PHPMailer/wiki/SMTP-Debugging
-			'Port' => ((ENVIRONMENT == 'production') ? 25 : 1025)
-		]
-	],
-	'handleNotices' => true
-]);
+use rothkj1022\PHPErrorHandler;
+$errorHandlerConfig = (require('example.config.php')); //EDIT THIS FILE
+$errorHandler = new PHPErrorHandler\PHPErrorHandler($errorHandlerConfig);
 
 // TRIGGER SOME ERRORS
 
