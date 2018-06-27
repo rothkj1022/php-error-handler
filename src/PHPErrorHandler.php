@@ -51,6 +51,7 @@ class PHPErrorHandler {
 					'Host' => 'localhost',
 					'Port' => 25,
 					'SMTPDebug' => 0,
+					'SMTPAutoTLS' => true,
 					'SMTPAuth' => false,
 					'Username' => '', // SMTP account username / email address
 					'Password' => '', // SMTP password
@@ -294,6 +295,7 @@ class PHPErrorHandler {
 			$mail->Host = $phpMailerConfig['Host']; // sets the SMTP server
 			$mail->Port = $phpMailerConfig['Port']; // set the SMTP port for the SMTP server
 			$mail->SMTPDebug = $phpMailerConfig['SMTPDebug'];
+			$mail->SMTPAutoTLS = $phpMailerConfig['SMTPAutoTLS']; // enable SMTP authentication
 			$mail->SMTPAuth = $phpMailerConfig['SMTPAuth']; // enable SMTP authentication
 			$mail->Username = $phpMailerConfig['Username']; // SMTP account username / email address
 			$mail->Password = $phpMailerConfig['Password']; // SMTP password

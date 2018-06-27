@@ -1,4 +1,4 @@
-# php-error-handler 2.0.4
+# php-error-handler
 
 PHP Error Handler can send you comprehensive error reports via email as well as output to the screen if you so choose.
 
@@ -390,6 +390,17 @@ default: 0 (no output)
 options: integer
 ```
 
+##### SMTPAutoTLS
+
+Whether to enable TLS encryption automatically if a server supports it, even if \`SMTPSecure\` is not set to 'tls'.
+
+See also PHPMailer [SMTPAutoTLS property](http://phpmailer.github.io/PHPMailer/classes/PHPMailer.PHPMailer.PHPMailer.html#property_SMTPAutoTLS) documentation
+
+```
+default: true
+options: boolean (true, false)
+```
+
 ##### SMTPAuth
 
 Enable SMTP authorization
@@ -541,6 +552,14 @@ $errorHandler->sendError('$myVar is not defined.', 'You should really define tha
 ```
 
 ## Changelog
+
+### Version 2.0.5
+
+* Added config var for allowing change of PHPMailer SMTPAutoTLS setting
+
+### Version 2.0.4
+
+* Added config vars for allowing change of reply-to address
 
 ### Version 2.0.3
 
