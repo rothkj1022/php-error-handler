@@ -3,6 +3,7 @@ return [
 	'displayErrors' => ((ENVIRONMENT == 'production') ? false : true),
 	'emailErrors' => ((ENVIRONMENT == 'production') ? true : false),
 	'logErrors' => true, //requires database
+	'cacheFolder' => FS_CACHE, //must end with slash
 	'database' => [
 		'driver' => 'pdo', //pdo or mysql
 		'dsn' => 'mysql:host='.DB_HOSTNAME.';dbname='.DB_DATABASE.';port='.DB_PORT.';charset=UTF8',

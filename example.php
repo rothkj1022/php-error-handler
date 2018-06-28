@@ -2,8 +2,11 @@
 require('vendor/autoload.php');
 require('src/PHPErrorHandler.php');
 
+$cacheFolder = dirname(__FILE__).'/tmp/';
+
 // contants for testing
 define('ENVIRONMENT', 'development'); // development, testing or production
+define('FS_CACHE', $cacheFolder);
 define('DB_HOSTNAME', 'localhost');
 define('DB_USERNAME', 'localdev');
 define('DB_PASSWORD', '7bhyGvtjmT5a');

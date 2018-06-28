@@ -70,7 +70,7 @@ $errorHandler = new PHPErrorHandler\PHPErrorHandler([
 	'emailErrors' => true,
 	'logErrors' => true, //requires database
 	'purgeLogTimeout' => '1 DAY', //use mysql date_add interval syntax or set to false
-	//'cacheFolder' => '', //needed for flood control
+	//'cacheFolder' => '/tmp/', //Folder for caching lookups, such as ip addresses.  Must end with slash.
 	'floodControl' => '15 MINUTE', //use mysql date_add interval syntax or set to false
 	'database' => [
 		/*'driver' => 'mysql', //pdo or mysql
@@ -130,6 +130,15 @@ Log errors to configured database
 ```
 default: false
 options: boolean (true / false)
+```
+
+#### cacheFolder
+
+Folder for caching lookups, such as ip addresses
+
+```
+default: false
+options: string (full path to the cache folder)
 ```
 
 #### purgeLogInterval
@@ -552,6 +561,11 @@ $errorHandler->sendError('$myVar is not defined.', 'You should really define tha
 ```
 
 ## Changelog
+
+### Version 2.0.6
+
+* Updated ip address lookups to fetch with Guzzle for better reliability.
+* Added cacheFolder option for caching remote lookups
 
 ### Version 2.0.5
 

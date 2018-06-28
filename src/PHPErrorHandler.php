@@ -14,6 +14,7 @@ class PHPErrorHandler {
 			'logErrors' => false, //requires database
 			'purgeLogInterval' => '1 DAY', //use mysql date_add interval syntax or set to false
 			'floodInterval' => '15 MINUTE', //use mysql date_add interval syntax or set to false
+			'cacheFolder' => false,
 			'database' => [
 				'driver' => 'mysql', //pdo or mysql
 				'dsn' => '',
@@ -152,10 +153,19 @@ class PHPErrorHandler {
 
 		//display ip location info
 		$ip = $_SERVER['REMOTE_ADDR'];
-		if ($ipData = @file_get_contents("http://ipinfo.io/{$ip}/json")) {
-			$ipInfo = json_decode($ipData);
+		$ipData = [];
+		$uri = "http://ipinfo.io/{$ip}/json";
+		if ($this->config['cacheFolder'] && is_dir($this->config['cacheFolder'])) {
+			//cache ip lookups
+			$cache = new \rothkj1022\FileCache\FileCache($this->config['cacheFolder']);
+			$ipData = $cache->getJsonData($uri); //default ttl is 1 hr
+		} else {
+			//no caching
+			$ipData = $this->getJsonData($uri);
+		}
+		if ($ipData) {
 			$output .= '<b>IP Details:</b><br />' . "\n";
-			foreach ($ipInfo as $key => $val) {
+			foreach ($ipData as $key => $val) {
 				$output .= "\t" . $key . ': ' . $val . '<br />' . "\n";
 			}
 			$output .= '<br /><br />'."\n";
@@ -422,5 +432,58 @@ class PHPErrorHandler {
 		}
 
 		return $merged;
+	}
+
+	/**
+	 * Get file or url contents from given path
+	 * @param string $uri The uri of the data we are fetching
+	 * @returns the data or false on failure
+	 */
+	private function file_get_contents($uri) {
+		$data = ((is_file($uri)) ? file_get_contents($uri) : $this->file_get_contents_remote($uri));
+		if ($data) {
+			return $data;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get remote url contents from given path
+	 * @param string $uri The uri of the data we are fetching
+	 * @returns the data or false on failure
+	 */
+	private function file_get_contents_remote($uri) {
+		//use guzzle to handle request
+		$client = new \GuzzleHttp\Client();
+		$requestOptions = [ 'verify' => false ]; // accommodates self-signed certs
+
+		try {
+			$response = $client->request('GET', $uri, $requestOptions);
+			if (in_array($response->getStatusCode(), array(200, 206))) {
+				$body = $response->getBody();
+				return (string)$body;
+			}
+		} catch (\Exception $e) {
+			$exceptionType = get_class($e);
+			$errorMsg = $exceptionType;
+			$request = $e->getRequest();
+			$requestMsg = \GuzzleHttp\Psr7\str($request);
+			echo 'Error getting content from: '.$uri.'. Request: '.$requestMsg;
+		}
+		return false;
+	}
+
+	/**
+	 * Get data we know is stored as JSON and decode it
+	 * @param string $uri The uri of the json data we are fetching
+	 * @returns the data or false on failure
+	 */
+	private function getJsonData($jsonUri) {
+		if ($jsonData = $this->file_get_contents($jsonUri)) {
+			//return decoded data
+			return json_decode($jsonData, true);
+		}
+		return false;
 	}
 }
