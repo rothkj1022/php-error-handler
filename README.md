@@ -523,6 +523,15 @@ default: false
 options: boolean (true, false)
 ```
 
+#### ipinfoToken
+
+Your API token for ipinfo.io if you have one
+
+```
+default: '';
+options: string
+```
+
 ### Public methods
 
 <table>
@@ -561,6 +570,11 @@ $errorHandler->sendError('$myVar is not defined.', 'You should really define tha
 ```
 
 ## Changelog
+
+### Version 2.0.7
+
+* Added config var for ipinfo.io API token
+* Fixed flood control
 
 ### Version 2.0.6
 

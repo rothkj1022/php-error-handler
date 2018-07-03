@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "91361d240539fc0be3f4ad690cbf9d80",
@@ -305,16 +305,16 @@
         },
         {
             "name": "rothkj1022/php-cache-class",
-            "version": "2.1.2",
+            "version": "2.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rothkj1022/php-cache-class.git",
-                "reference": "98499d5ce25d101fce006417472049a3a2a9bfcf"
+                "reference": "006a52dd7aff9a1fdfc0cc2b902e9e89277eb1e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rothkj1022/php-cache-class/zipball/98499d5ce25d101fce006417472049a3a2a9bfcf",
-                "reference": "98499d5ce25d101fce006417472049a3a2a9bfcf",
+                "url": "https://api.github.com/repos/rothkj1022/php-cache-class/zipball/006a52dd7aff9a1fdfc0cc2b902e9e89277eb1e1",
+                "reference": "006a52dd7aff9a1fdfc0cc2b902e9e89277eb1e1",
                 "shasum": ""
             },
             "require": {
@@ -346,7 +346,7 @@
                 }
             ],
             "description": "A simple file based cache based from Erik Giberti's FileCache class, forked from lodev09/php-cache-class.",
-            "time": "2018-06-18T20:34:52+00:00"
+            "time": "2018-07-03T20:25:09+00:00"
         }
     ],
     "packages-dev": [],

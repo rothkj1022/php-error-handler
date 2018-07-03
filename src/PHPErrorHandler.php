@@ -26,6 +26,7 @@ class PHPErrorHandler {
 				'charset' => 'utf8',
 				'table' => 'error_reports'
 			],
+			'ipinfoToken' => '',
 			'email' => [
 				'recipients' => [
 					'to' => [
@@ -154,21 +155,24 @@ class PHPErrorHandler {
 		//display ip location info
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$ipData = [];
-		$uri = "http://ipinfo.io/{$ip}/json";
+		$uri = "http://ipinfos.io/{$ip}/json";
+		$uri .= ((!empty($this->config['ipinfoToken'])) ? '?token='.$this->config['ipinfoToken'] : '');
 		if ($this->config['cacheFolder'] && is_dir($this->config['cacheFolder'])) {
 			//cache ip lookups
 			$cache = new \rothkj1022\FileCache\FileCache($this->config['cacheFolder']);
-			$ipData = $cache->getJsonData($uri); //default ttl is 1 hr
+			$ipData = $cache->file_get_contents($uri); //default ttl is 1 hr
 		} else {
 			//no caching
-			$ipData = $this->getJsonData($uri);
+			$ipData = $this->file_get_contents($uri);
 		}
-		if ($ipData) {
-			$output .= '<b>IP Details:</b><br />' . "\n";
-			foreach ($ipData as $key => $val) {
+		$output .= '<b>IP Details:</b><br />' . "\n";
+		if ($ipInfo = json_decode($ipData)) {
+			foreach ($ipInfo as $key => $val) {
 				$output .= "\t" . $key . ': ' . $val . '<br />' . "\n";
 			}
 			$output .= '<br /><br />'."\n";
+		} else {
+			$output .= $ipData;
 		}
 		$output .= '<hr />'."\n";
 
@@ -177,6 +181,7 @@ class PHPErrorHandler {
 
 	private function logErrorReport($errno, $errstr, $errfile, $errline, $errdetails) {
 		//logs error report, returns whether report has already been logged in last x mins
+		$alreadyLogged = false;
 
 		restore_error_handler();
 
@@ -234,7 +239,7 @@ class PHPErrorHandler {
 			$query = $mysqli->query($sql);
 			if ($query->num_rows > 0) {
 				//there is already an error logged within the last floodInterval
-				//return true;
+				$alreadyLogged = true;
 			} else {
 				//error has not been logged in last floodInterval, log it
 				$sql = "insert into ".$dbTable." (domain, timestamp, error_level, error_msg, error_file, error_line, error_details)";
@@ -242,6 +247,7 @@ class PHPErrorHandler {
 				//echo $sql;
 				$mysqli->query($sql); // or die('Error inserting record: '.$mysqli->error.': '.$sql);
 			}
+			$mysqli->close();
 		} else if ($dbDriver == 'pdo') {
 			//check if error has already been logged in past floodInterval
 			$sql = "select * from ".$dbTable." where domain = :domain and error_level = :errno and error_msg = :errstr and error_file = :errfile and error_line = :errline and timestamp > date_add(now(), INTERVAL -".$this->config['floodInterval'].");";
@@ -259,7 +265,7 @@ class PHPErrorHandler {
 			}
 			if (sizeof($result) > 0) {
 				//there is already an error logged within the last floodInterval
-				//return true;
+				$alreadyLogged = true;
 			} else {
 				//error has not been logged in last floodInterval, log it
 				$sql = "insert into ".$dbTable." (domain, timestamp, error_level, error_msg, error_file, error_line, error_details)";
@@ -279,11 +285,9 @@ class PHPErrorHandler {
 			}
 		}
 
-		//$mysqli->close();
-
 		set_error_handler([$this, 'genericErrorHandler']);
 
-		return false;
+		return $alreadyLogged;
 	}
 
 	private function emailErrorReport($htmlBody) {
@@ -465,24 +469,23 @@ class PHPErrorHandler {
 				return (string)$body;
 			}
 		} catch (\Exception $e) {
-			$exceptionType = get_class($e);
-			$errorMsg = $exceptionType;
+			$msgDetails = '<br /><b>Guzzle GET request from:</b> '.$uri.'<br /><br />';
 			$request = $e->getRequest();
 			$requestMsg = \GuzzleHttp\Psr7\str($request);
-			echo 'Error getting content from: '.$uri.'. Request: '.$requestMsg;
-		}
-		return false;
-	}
-
-	/**
-	 * Get data we know is stored as JSON and decode it
-	 * @param string $uri The uri of the json data we are fetching
-	 * @returns the data or false on failure
-	 */
-	private function getJsonData($jsonUri) {
-		if ($jsonData = $this->file_get_contents($jsonUri)) {
-			//return decoded data
-			return json_decode($jsonData, true);
+			$msgDetails .= '<b>Request:</b> '.$requestMsg;
+			if ($e->hasResponse()) {
+				$response = $e->getResponse();
+				$msgDetails .= '<br /><br /><b>Response:</b> HTTP/'.$response->getProtocolVersion().' '.$response->getStatusCode().' '.$response->getReasonPhrase().'<br /><br />';
+				$responseHeaders = $response->getHeaders();
+				$headersList = '';
+				foreach($responseHeaders as $key => $val) {
+					$val = (is_array($val) ? $val[0] : $val);
+					$headersList .= $key.': '.$val.'<br />';
+				}
+				$msgDetails .= '<b>Response Headers:</b><br />'.$headersList;
+			}
+			$msgDetails = trim($msgDetails);
+			return 'Error fetching content from: '.$uri.'. Request: '.$requestMsg.'. Details: '.$msgDetails;
 		}
 		return false;
 	}
