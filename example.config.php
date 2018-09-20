@@ -10,6 +10,7 @@ return [
 		'username' => DB_USERNAME,
 		'password' => DB_PASSWORD
 	],
+	'ipinfoToken' => '',
 	'email' => [
 		'recipients' => [
 			'to' => [

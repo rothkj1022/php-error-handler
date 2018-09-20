@@ -155,7 +155,7 @@ class PHPErrorHandler {
 		//display ip location info
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$ipData = [];
-		$uri = "http://ipinfos.io/{$ip}/json";
+		$uri = "https://ipinfo.io/{$ip}/json";
 		$uri .= ((!empty($this->config['ipinfoToken'])) ? '?token='.$this->config['ipinfoToken'] : '');
 		if ($this->config['cacheFolder'] && is_dir($this->config['cacheFolder'])) {
 			//cache ip lookups
