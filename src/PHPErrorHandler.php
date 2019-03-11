@@ -93,6 +93,9 @@ class PHPErrorHandler {
 		error_reporting(implode('|', $this->config['warningTypes']));
 		set_error_handler([$this, 'genericErrorHandler']);
 
+		//handle exceptions
+		restore_exception_handler();
+	
 		//handle fatal errors
 		//ob_start([$this, 'fatalErrorHandler']);
 		register_shutdown_function([$this, 'fatalErrorShutdownHandler']);
@@ -358,7 +361,11 @@ class PHPErrorHandler {
 	}
 
 	public function genericErrorHandler($errno, $errstr, $errfile, $errline) {
-		//gather output
+		$isError = ((in_array($errno, $this->config['errorTypes']) & $errno) === $errno);
+		if ($isError) {
+			set_status_header(500);
+		}
+
 		if (error_reporting() && $errorString = $this->errorString($errno, $errstr, $errfile, $errline)) {
 			$output = $this->errorMsgOutput($errorString);
 
@@ -377,8 +384,10 @@ class PHPErrorHandler {
 			}
 		}
 
-		//Don't execute PHP internal error handler
-		return true;
+		//halt on error
+		if ($isError) {
+			exit(1); // EXIT_ERROR
+		}
 	}
 
 	public function fatalErrorShutdownHandler() {
