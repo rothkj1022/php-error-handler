@@ -95,7 +95,7 @@ class PHPErrorHandler {
 
 		//handle exceptions
 		restore_exception_handler();
-	
+
 		//handle fatal errors
 		//ob_start([$this, 'fatalErrorHandler']);
 		register_shutdown_function([$this, 'fatalErrorShutdownHandler']);
@@ -362,7 +362,8 @@ class PHPErrorHandler {
 
 	public function genericErrorHandler($errno, $errstr, $errfile, $errline) {
 		$isError = ((in_array($errno, $this->config['errorTypes']) & $errno) === $errno);
-		if ($isError) {
+		if ($isError && function_exists('set_status_header')) {
+			//for CodeIgniter
 			set_status_header(500);
 		}
 
