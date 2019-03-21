@@ -158,7 +158,7 @@ class PHPErrorHandler {
 		}
 
 		//display ip location info
-		$ip = $_SERVER['REMOTE_ADDR'];
+		$ip = $this->getRealIpAddr();
 		$ipData = [];
 		$uri = "https://ipinfo.io/{$ip}/json";
 		$uri .= ((!empty($this->config['ipinfoToken'])) ? '?token='.$this->config['ipinfoToken'] : '');
@@ -501,4 +501,17 @@ class PHPErrorHandler {
 		}
 		return false;
 	}
+
+	private function getRealIpAddr() {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            //check ip from share internet
+            $ip=$_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            //to check ip is pass from proxy
+            $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip=$_SERVER['REMOTE_ADDR'];
+        }
+        return $ip;
+    }
 }
