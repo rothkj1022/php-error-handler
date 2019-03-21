@@ -125,7 +125,15 @@ class PHPErrorHandler {
 			$output .= 'Details: ' . $msgDetails . '<br /><br />' . "\n\n";
 		}
 
+		$currentUri = array();
+		$scheme = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http");
+		$scheme = ((!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) ? $_SERVER['HTTP_X_FORWARDED_PROTO'] : $scheme);
+		$uriFull = $scheme . '://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+		$currentUri = parse_url($uriFull);
+		$output .= 'URL: ' . $uriFull . '<br /><br />' . "\n\n";
+		
 		$arrayVars = [
+			//'URI' => $currentUri,
 			'$_GET' => (isset($_GET) ? $_GET : array()),
 			'$_POST' => (isset($_POST) ? $_POST : array()),
 			//'$_REQUEST' => (isset($_SESSION) ? $_SESSION : array())$_REQUEST,
