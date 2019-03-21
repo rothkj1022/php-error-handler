@@ -118,11 +118,11 @@ class PHPErrorHandler {
 	}
 
 	private function errorMsgOutput($errorMsg, $msgDetails = '') {
-		$output = 'An error has occured.<br /><br />' . "\n\n";
-		$output .= 'Time: ' . date("m/d/y g:i:s a") . '<br /><br />' . "\n\n";
-		$output .= 'Message: ' . $errorMsg . '<br /><br />' . "\n\n";
+		$output = '<p>An error has occured.</p>' . "\n\n";
+		$output .= '<p>Time: ' . date("m/d/y g:i:s a") . '</p>' . "\n\n";
+		$output .= '<p>Message: ' . $errorMsg . '</p>' . "\n\n";
 		if (!empty($msgDetails)) {
-			$output .= 'Details: ' . $msgDetails . '<br /><br />' . "\n\n";
+			$output .= '<p>Details: ' . $msgDetails . '</p>' . "\n\n";
 		}
 
 		$currentUri = array();
@@ -130,7 +130,7 @@ class PHPErrorHandler {
 		$scheme = ((!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) ? $_SERVER['HTTP_X_FORWARDED_PROTO'] : $scheme);
 		$uriFull = $scheme . '://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 		$currentUri = parse_url($uriFull);
-		$output .= 'URL: ' . $uriFull . '<br /><br />' . "\n\n";
+		$output .= '<p>URL: ' . $uriFull . '</p>' . "\n\n";
 		
 		$arrayVars = [
 			//'URI' => $currentUri,
@@ -140,26 +140,20 @@ class PHPErrorHandler {
 			'$_FILES' => (isset($_FILES) ? $_FILES : array()),
 			'$_COOKIE' => (isset($_COOKIE) ? $_COOKIE : array()),
 			'$_SESSION' => (isset($_SESSION) ? $_SESSION : array()),
-			'$_SERVER' => (isset($_SERVER) ? $_SERVER : array())
+			'$_SERVER' => (isset($_SERVER) ? $_SERVER : array()),
+			//'$_ENV' => (isset($_ENV) ? $_ENV : array())
 		];
+
+		$cloner = new \Symfony\Component\VarDumper\Cloner\VarCloner();
+		$htmlDumper = new \Symfony\Component\VarDumper\Dumper\HtmlDumper();
+		$htmlDumper->setTheme('light');
+
 		//for ($i = 0; $i < sizeof($arrayVars); $i++) {
 		foreach ($arrayVars as $aryKey => $aryTmp) {
 			if (is_array($aryTmp) && sizeof($aryTmp) > 0) {
-				$output .= '<b>' . $aryKey . ':</b><br />' . "\n";
-				foreach ($aryTmp as $key => $val) {
-					//$output .= "\t" . $key . ': ' . ((empty($val)) ? $val : htmlentities($val)) . "\n";
-					if (is_array($val) && sizeof($val) > 0) {
-						//$val = print_r($val, true);
-						ob_start();
-						var_dump($val);
-						$val = ob_get_clean();
-						$val = str_replace("  ", ' &nbsp; &nbsp;', $val);
-						$val = nl2br($val);
-					}
-					$output .= "\t" . $key . ': ' . $val . '<br />' . "\n";
-				}
-				//$output .= print_r($aryTmp, true);
-				$output .= '<br />' . "\n";
+				$output .= '<p><b>' . $aryKey . ':</b><br />' . "\n";
+				$output .= $htmlDumper->dump($cloner->cloneVar($aryTmp), true);
+				$output .= '</p>' . "\n";
 			}
 		}
 
@@ -176,12 +170,12 @@ class PHPErrorHandler {
 			//no caching
 			$ipData = $this->file_get_contents($uri);
 		}
-		$output .= '<b>IP Details:</b><br />' . "\n";
+		$output .= '<p><b>IP Details:</b><br />' . "\n";
 		if ($ipInfo = json_decode($ipData)) {
 			foreach ($ipInfo as $key => $val) {
 				$output .= "\t" . $key . ': ' . $val . '<br />' . "\n";
 			}
-			$output .= '<br /><br />'."\n";
+			$output .= '</p>'."\n";
 		} else {
 			$output .= $ipData;
 		}
