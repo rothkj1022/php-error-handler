@@ -12,14 +12,12 @@
 		"php": "^5.4 || ^7.0",
 		"phpmailer/phpmailer": "^6.0",
         "guzzlehttp/guzzle": "^6.3",
-		"rothkj1022/php-cache-class": "^2.1.2"
+		"rothkj1022/php-cache-class": "^2.1.2",
+		"symfony/var-dumper": "^4.2"
 	},
 	"autoload": {
 		"psr-4": {
 			"rothkj1022\\PHPErrorHandler\\": "src"
 		}
-	},
-	"require-dev": {
-		"symfony/var-dumper": "^4.2"
 	}
 }
