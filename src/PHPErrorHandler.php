@@ -90,7 +90,7 @@ class PHPErrorHandler {
 		}
 
 		//catch and handle all warnings
-		error_reporting(implode('|', $this->config['warningTypes']));
+		error_reporting((int)implode('|', $this->config['warningTypes']));
 		set_error_handler([$this, 'genericErrorHandler']);
 
 		//handle exceptions
@@ -396,9 +396,9 @@ class PHPErrorHandler {
 	public function fatalErrorShutdownHandler() {
 		// run after entire script has executed
 		$error = error_get_last();
-		if (in_array($error['type'], $this->config['errorTypes'])) {
+		if (isset($error['type']) && in_array($error['type'], $this->config['errorTypes'])) {
 			//report and handle fatal errors
-			error_reporting(implode('|', $this->config['errorTypes']));
+			error_reporting((int)implode('|', $this->config['errorTypes']));
 			$this->genericErrorHandler($error['type'], $error['message'], $error['file'], $error['line']);
 			error_reporting(0);
 		}
