@@ -200,6 +200,9 @@ class PHPErrorHandler {
 			$pdo = $this->dbConn;
 		}
 
+		//truncate error string if longer than 2000 characters
+		$errstr = ((strlen($errstr) > 2000) ? substr($errstr, 0, 1997).'...' : $errstr);
+
 		//create the table if necessary
 		$sql = "CREATE TABLE IF NOT EXISTS `".$dbTable."` ( ".
 			"`error_id` int(11) NOT NULL AUTO_INCREMENT, ".
