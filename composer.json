@@ -8,10 +8,10 @@
 			"name": "Kevin Roth"
 		}
 	],
-		"require": {
-		"php": "^5.4 || ^7.0 || ^8.0",
-		"phpmailer/phpmailer": "^6.5.0",
-	        "guzzlehttp/guzzle": "^6.3",
+	"require": {
+		"php": "^8.0",
+		"phpmailer/phpmailer": "^7.0",
+	        "guzzlehttp/guzzle": "^7.10",
 		"rothkj1022/php-cache-class": "^2.1.2",
 		"symfony/var-dumper": "^4.2"
 	},
