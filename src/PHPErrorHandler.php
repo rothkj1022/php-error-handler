@@ -485,10 +485,16 @@ class PHPErrorHandler {
 			}
 		} catch (\Exception $e) {
 			$msgDetails = '<br /><b>Guzzle GET request from:</b> '.$uri.'<br /><br />';
-			$request = $e->getRequest();
-			$requestMsg = \GuzzleHttp\Psr7\str($request);
-			$msgDetails .= '<b>Request:</b> '.$requestMsg;
-			if ($e->hasResponse()) {
+			$msgDetails .= '<b>Error:</b> '.$e->getMessage().'<br /><br />';
+			// Only Guzzle's request and connect exceptions carry the request. Message::toString()
+			// replaces \GuzzleHttp\Psr7\str(), which guzzlehttp/psr7 2.x (used by Guzzle 7) removed.
+			$requestMsg = '';
+			if ($e instanceof \GuzzleHttp\Exception\RequestException || $e instanceof \GuzzleHttp\Exception\ConnectException) {
+				$requestMsg = \GuzzleHttp\Psr7\Message::toString($e->getRequest());
+				$msgDetails .= '<b>Request:</b> '.$requestMsg;
+			}
+			// In Guzzle 7, ConnectException no longer extends RequestException and has no hasResponse()
+			if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
 				$response = $e->getResponse();
 				$msgDetails .= '<br /><br /><b>Response:</b> HTTP/'.$response->getProtocolVersion().' '.$response->getStatusCode().' '.$response->getReasonPhrase().'<br /><br />';
 				$responseHeaders = $response->getHeaders();
