@@ -4,9 +4,13 @@ namespace rothkj1022\PHPErrorHandler;
 class PHPErrorHandler {
 	private $config = [];
 	private $dbConn;
+	// Site name for the email subject and the error log. SERVER_NAME isn't set when PHP
+	// runs from the command line (cron jobs), so fall back to the machine's host name.
+	private $serverName;
 
 	// Class constructor
 	public function __construct($config = []) {
+		$this->serverName = $_SERVER['SERVER_NAME'] ?? gethostname();
 		//set default config
 		$this->config = $defaultConfig = [
 			'displayErrors' => false,
@@ -46,7 +50,7 @@ class PHPErrorHandler {
 					'address' => '',
 					'name' => ''
 				],
-				'subject' => 'PHP Error Report from ' . $_SERVER['SERVER_NAME'],
+				'subject' => 'PHP Error Report from ' . $this->serverName,
 				'PHPMailer' => [
 					'CharSet' => 'utf-8',
 					'isSMTP' => false,
@@ -242,7 +246,7 @@ class PHPErrorHandler {
 
 		if ($dbDriver == 'mysql') {
 			//check if error has already been logged in past floodInterval mins
-			$sql = "select * from ".$dbTable." where domain = '".$_SERVER['SERVER_NAME']."' and error_level = ".$errno." and error_msg = '".$mysqli->real_escape_string($errstr)."' and error_file = '".$mysqli->real_escape_string($errfile)."' and error_line = ".$errline." and timestamp > date_add(now(), INTERVAL -".$this->config['floodInterval'].");";
+			$sql = "select * from ".$dbTable." where domain = '".$mysqli->real_escape_string($this->serverName)."' and error_level = ".$errno." and error_msg = '".$mysqli->real_escape_string($errstr)."' and error_file = '".$mysqli->real_escape_string($errfile)."' and error_line = ".$errline." and timestamp > date_add(now(), INTERVAL -".$this->config['floodInterval'].");";
 			//echo $sql;
 			$query = $mysqli->query($sql);
 			if ($query->num_rows > 0) {
@@ -251,7 +255,7 @@ class PHPErrorHandler {
 			} else {
 				//error has not been logged in last floodInterval, log it
 				$sql = "insert into ".$dbTable." (domain, timestamp, error_level, error_msg, error_file, error_line, error_details)";
-				$sql .= " values ('".$_SERVER['SERVER_NAME']."', now(), ".$errno.", '".$mysqli->real_escape_string($errstr)."', '".$mysqli->real_escape_string($errfile)."', ".$errline.", '".$mysqli->real_escape_string($errdetails)."');";
+				$sql .= " values ('".$mysqli->real_escape_string($this->serverName)."', now(), ".$errno.", '".$mysqli->real_escape_string($errstr)."', '".$mysqli->real_escape_string($errfile)."', ".$errline.", '".$mysqli->real_escape_string($errdetails)."');";
 				//echo $sql;
 				$mysqli->query($sql); // or die('Error inserting record: '.$mysqli->error.': '.$sql);
 			}
@@ -261,7 +265,7 @@ class PHPErrorHandler {
 			$sql = "select * from ".$dbTable." where domain = :domain and error_level = :errno and error_msg = :errstr and error_file = :errfile and error_line = :errline and timestamp > date_add(now(), INTERVAL -".$this->config['floodInterval'].");";
 			try {
 				$stmt = $pdo->prepare($sql) or die(print_r($pdo->errorInfo(), true).' Query: '.$sql);
-				$stmt->bindParam(':domain', $_SERVER['SERVER_NAME']);
+				$stmt->bindParam(':domain', $this->serverName);
 				$stmt->bindParam(':errno', $errno);
 				$stmt->bindParam(':errstr', $errstr);
 				$stmt->bindParam(':errfile', $errfile);
@@ -280,7 +284,7 @@ class PHPErrorHandler {
 				$sql .= " values (:domain, now(), :errno, :errstr, :errfile, :errline, :errdetails);";
 				try {
 					$stmt = $pdo->prepare($sql) or die(print_r($pdo->errorInfo(), true).' Query: '.$sql);
-					$stmt->bindParam(':domain', $_SERVER['SERVER_NAME']);
+					$stmt->bindParam(':domain', $this->serverName);
 					$stmt->bindParam(':errno', $errno);
 					$stmt->bindParam(':errstr', $errstr);
 					$stmt->bindParam(':errfile', $errfile);
